@@ -1,3 +1,3 @@
 # RobustInference
 
-![Alt text](img.jpg?raw=true "Title")
+![Alt text](Merging_Datasets.png?raw=true "Title")
