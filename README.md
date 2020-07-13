@@ -10,5 +10,5 @@ An alternative approach for learning statistical models when the data is not com
 
 Mathematically speaking, RIFLE solves the following min-max problem:
 
-![Alt text](Merging_Datasets.png?raw=true "DRO_framework")
+![Alt text](general_framework.jpg?raw=true "DRO_framework")
 
