@@ -13,3 +13,10 @@ Mathematically speaking, RIFLE solves the following min-max problem:
 <div align='center'> 
 <img src="general_framework.jpg" width="350" align='center'>
 </div>
+
+## Robust Linear Regression Imputer
+To run the robust linear regression imputer on a given dataset containing missing values, execute the following command on a terminal (linux) or command line (windows):
+
+```
+python run.py input_file.csv output_file.csv 
+```
