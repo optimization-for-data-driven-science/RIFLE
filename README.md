@@ -10,6 +10,4 @@ An alternative approach for learning statistical models when the data is not com
 
 Mathematically speaking, RIFLE solves the following min-max problem:
 
-![Alt text](general_framework.jpg?raw=true "DRO_framework")
-
-<img src="general_framework.jpg" width="800">
+<img src="general_framework.jpg" width="400">
