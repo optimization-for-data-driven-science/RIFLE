@@ -12,3 +12,4 @@ Mathematically speaking, RIFLE solves the following min-max problem:
 
 ![Alt text](general_framework.jpg?raw=true "DRO_framework")
 
+<img src="general_framework.jpg" width="100">
