@@ -1,4 +1,4 @@
 # Robust InFerence via Low-order moment Estimations (RIFLE)
-RIFLE is a general framework for learning parameters of a statistical learning model on datasets containing a large amount of missing values. 
+RIFLE is a general framework for learning parameters of a statistical learning model on datasets containing a large amount of missing values. Supervised learning approaches, including linear regression, logistic regression, neural networks, and support vector machine (SVM) initially assume that the input data is complete, containing no missing values. However, availability of such clean datasets is scarce in many practical problems, especially in electronic medical records and clinical research. Integration of multiple datasets may also increase the size of data available to researchers as different organizations collect data from similar population in different areas. The obtained datasets can contain large blocks of missing values as they may not share exactly the same features (See below figure).
 
-![Alt text](Merging_Datasets.png?raw=true "Title")
+![Alt text](Merging_Datasets.png?raw=true "Title")One
