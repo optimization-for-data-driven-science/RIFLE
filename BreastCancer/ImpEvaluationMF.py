@@ -2,9 +2,9 @@ import pandas as pd
 import numpy as np
 from math import sqrt
 
-imputed_data = pd.read_csv('MF_BC_MCAR30_1.csv')
+imputed_data = pd.read_csv('MF_BC60.csv')
 original = pd.read_csv('BC.csv')
-missing = pd.read_csv('missing_BC_MCAR30_1.csv')
+missing = pd.read_csv('missing_BC_MCAR60.csv')
 
 feature_names = []
 

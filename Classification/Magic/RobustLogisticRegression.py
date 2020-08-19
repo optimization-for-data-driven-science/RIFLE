@@ -4,6 +4,9 @@ from math import fabs
 from sklearn.preprocessing import StandardScaler
 
 
+number_of_samples = 1000
+
+
 def sigmoid(inp):
     return 1.0 / (1.0 + np.exp(-inp))
 
@@ -23,8 +26,10 @@ def find_mean_and_covariance(data_set, sample_num=-1):
             columns = data_set[[feature_i, feature_j]]
 
             intersections = columns[columns[[feature_i, feature_j]].notnull().all(axis=1)]
-            sample = intersections.sample(sample_num, replace=True).to_numpy()
 
+            if intersections.shape[0] < 2:
+                pass
+            sample = intersections.sample(sample_num, replace=True).to_numpy()
             f1 = sample[:, 0]
             f2 = sample[:, 1]
 
@@ -47,8 +52,7 @@ def find_mean_and_covariance(data_set, sample_num=-1):
     return mu, cov_matrix
 
 
-train = pd.read_csv('train_missing_MCAR90_noy.csv')
-
+train = pd.read_csv('train_missing_MCAR40_1000_noy.csv')
 # Data normalization:
 X = train.drop(['10'], axis=1)
 sc = StandardScaler()
@@ -79,7 +83,7 @@ Y_test = Y_test.to_numpy()
 
 n = train.shape[0]
 d = train.shape[1] - 1
-number_of_estimations = 50
+number_of_estimations = 1
 number_of_iterations = 1000
 epsilon = 0.01
 delta = 0.1
@@ -120,13 +124,13 @@ for iteration in range(number_of_iterations):
     a1 = np.zeros(number_of_estimations)
 
     for i in range(number_of_estimations):
-        current_data = np.random.multivariate_normal(mu_1s[i], sigma_1s[i], size=1000)
+        current_data = np.random.multivariate_normal(mu_1s[i], sigma_1s[i], size=number_of_samples)
 
         res = - np.log(sigmoid(np.dot(current_data, w)))
         a1[i] = res.mean()
 
     for i in range(number_of_estimations):
-        current_data = np.random.multivariate_normal(mu_0s[i], sigma_0s[i], size=1000)
+        current_data = np.random.multivariate_normal(mu_0s[i], sigma_0s[i], size=number_of_samples)
 
         res = - np.log(1 - sigmoid(np.dot(current_data, w)))
         a0[i] = res.mean()
@@ -172,7 +176,7 @@ for iteration in range(number_of_iterations):
     # Updating w:
     total_grad = np.zeros(shape=(w.shape[0], ))
     for counter in range(number_of_estimations):
-        data_batch = np.random.multivariate_normal(mu_1s[counter], sigma_1s[counter], size=1000)
+        data_batch = np.random.multivariate_normal(mu_1s[counter], sigma_1s[counter], size=number_of_samples)
 
         inner = 1 - sigmoid(np.dot(data_batch, w))
 
@@ -180,10 +184,10 @@ for iteration in range(number_of_iterations):
         grad = np.dot(inner, data_batch)
 
         grad = np.sum(grad, axis=0)
-        total_grad -= pi_1 * grad / 1000
+        total_grad -= pi_1 * grad / number_of_samples
 
     for counter in range(number_of_estimations):
-        data_batch = np.random.multivariate_normal(mu_0s[counter], sigma_0s[counter], size=1000)
+        data_batch = np.random.multivariate_normal(mu_0s[counter], sigma_0s[counter], size=number_of_samples)
 
         inner = sigmoid(np.dot(data_batch, w))
 
@@ -192,7 +196,7 @@ for iteration in range(number_of_iterations):
 
         grad = np.sum(grad, axis=0)
 
-        total_grad += pi_0 * grad / 1000
+        total_grad += pi_0 * grad / number_of_samples
 
     total_grad = total_grad.reshape(w.shape)
     w -= 0.01 * total_grad

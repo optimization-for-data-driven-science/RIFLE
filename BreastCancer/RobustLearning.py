@@ -10,11 +10,10 @@ for i in range(1, 34):
 rmses = []
 for column_name in column_names:
 
-    data = pd.read_csv('missing_BC_MCAR30_1.csv')
+    data = pd.read_csv('missing_BC_MCAR60.csv')
     data_points = data.shape[0]
     dimension = data.shape[1]
     validation_threshold = dimension // 10
-    # print(validation_threshold)
     X = data.drop([column_name], axis=1)
 
     mask_X = X.isna()
@@ -257,7 +256,9 @@ for column_name in column_names:
         currentCmax = currentCmax[:, nonzeros]
 
         currentBmin = b_min[nonzeros, :]
-        currentBmax = b_min[nonzeros, :]
+        currentBmax = b_max[nonzeros, :]
+        # currentBmax = b_min[nonzeros, :]
+
         ident = np.identity(currentCmax.shape[0])
 
         best_res = 9999

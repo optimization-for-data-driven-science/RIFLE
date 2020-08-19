@@ -4,6 +4,8 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 
+number_of_iterations = 2000
+
 predicts1 = []
 predicts2 = []
 
@@ -303,8 +305,7 @@ for i in range(number_of_test_points):
     rmse_avg1 += best_solution1 * best_solution1
 
     # Now Solving min-max
-    step_size = best_lam / 1000
-    number_of_iterations = 2000
+    step_size = best_lam / 100
 
     currentCmin = C_min[nonzeros, :]
     currentCmin = currentCmin[:, nonzeros]
@@ -408,3 +409,6 @@ print(avg2 / 2000 / original_std)
 print("------------------------------------")
 print(sqrt(rmse_avg1 / 2000) / original_std)
 print(sqrt(rmse_avg2 / 2000) / original_std)
+
+
+print("Number of iterations: ", number_of_iterations)

@@ -4,9 +4,11 @@ import random
 
 
 train = pd.read_csv('train_data.csv')
+train = train.sample(n=100)
+
 test = pd.read_csv('test_data.csv')
 
-missingValueRate = 0.8
+missingValueRate = 0.5
 
 n, d = train.shape
 
@@ -20,9 +22,10 @@ for i in range(n):
 
 mask[mask == 0] = np.nan
 
+
 print(mask)
 ind = train.index
 cols = train.columns
 train_missing = np.multiply(mask, train)
 print(train_missing)
-train_missing.to_csv('train_missing80.csv', index=False)
+train_missing.to_csv('train_missing100_50.csv', index=False)

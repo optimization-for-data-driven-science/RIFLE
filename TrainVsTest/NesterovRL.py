@@ -3,7 +3,8 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-number_of_iterations = 400
+number_of_iterations = 575
+
 gammas = [0]
 current_gamma = 0
 for i in range(number_of_iterations):
@@ -19,8 +20,10 @@ avg2 = 0
 rmse_avg1 = 0
 rmse_avg2 = 0
 
-data = pd.read_csv('missing_Beta_MCAR_85_10_300.csv')
-test_data = pd.read_csv("test_Beta_MCAR_85_2000_300.csv")
+# data = pd.read_csv('missing_Beta_MCAR_85_10_300.csv')
+# test_data = pd.read_csv("test_Beta_MCAR_85_2000_300.csv")
+data = pd.read_csv('super_conduct_train_1000_mcar40.csv')
+test_data = pd.read_csv('super_conduct_test_data.csv')
 
 data_points = data.shape[0]
 dimension = data.shape[1]
@@ -439,3 +442,5 @@ print(avg2 / 2000 / original_std)
 print("------------------------------------")
 print(sqrt(rmse_avg1 / 2000) / original_std)
 print(sqrt(rmse_avg2 / 2000) / original_std)
+
+print("Number of iterations: ", number_of_iterations)
