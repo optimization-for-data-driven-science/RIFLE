@@ -108,7 +108,10 @@ class RobustImputer:
         mask_Y = np.ones(shape=mask_Y_test.shape) - mask_Y_test
 
         mask_gram = np.dot(mask_X.T, mask_X)
+        cov_gram = np.dot(mask_X.T, mask_Y)
+
         mask_gram = np.where(mask_gram == 0, 1, mask_gram)
+        cov_gram = np.where(cov_gram == 0, 1, cov_gram)
 
         X = X.to_numpy()
         X = np.nan_to_num(X)
@@ -117,7 +120,7 @@ class RobustImputer:
         Y = np.nan_to_num(Y)
 
         C = np.dot(X.T, X) / mask_gram
-        b = np.dot(X.T, Y) / np.dot(mask_X.T, mask_Y)
+        b = np.dot(X.T, Y) / cov_gram
 
         C_min = C - self.interval_length_constant * currentDelta
         C_max = C + self.interval_length_constant * currentDelta
@@ -211,9 +214,10 @@ class RobustImputer:
         original_data = self.data
         standard_deviations = original_data.std()
         means = original_data.mean()
-        data_cols = original_data.columns()
+        data_cols = original_data.columns
 
         for column_ind in range(original_data.shape[1]):
+            print(data_cols[column_ind] + " is imputed.")
             predictions = self.impute_data(column_ind)
             predictions = [x * standard_deviations[column_ind] + means[column_ind] for x in predictions]
 

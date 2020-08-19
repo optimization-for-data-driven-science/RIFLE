@@ -129,6 +129,7 @@ def impute_data(data, confidence_intervals, column_index, confidence_interval_co
 
         size = 0
         counter = 0
+        indices = None
         while size < data_points // 10:
             indices = np.argwhere(number_of_non_zeros < validation_threshold + counter)
             indices = np.reshape(indices, (indices.shape[0],))
@@ -179,7 +180,7 @@ def impute_data(data, confidence_intervals, column_index, confidence_interval_co
         currentBmax = b_max[nonzeros, :]
         ident = np.identity(currentCmax.shape[0])
 
-        best_res = 9999
+        # best_res = 9999
         theta = np.dot(np.linalg.inv(currentC + best_lam * ident), currentB)
 
         for k in range(number_of_iterations):
@@ -218,10 +219,10 @@ means = original_data.mean()
 
 Delta = estimate_confidence_intervals(transformed_data)
 
-for column_index in range(original_data.shape[1]):
-    predictions = impute_data(transformed_data, Delta, column_index)
-    predictions = [x * standard_deviations[column_index] + means[column_index] for x in predictions]
+for column_ind in range(original_data.shape[1]):
+    predictions = impute_data(transformed_data, Delta, column_ind)
+    predictions = [x * standard_deviations[column_ind] + means[column_ind] for x in predictions]
 
-    original_data[data_cols[column_index]] = predictions
+    original_data[data_cols[column_ind]] = predictions
 
 original_data.to_csv("output.csv", index=False)
