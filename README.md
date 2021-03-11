@@ -14,9 +14,16 @@ Mathematically speaking, RIFLE solves the following min-max problem:
 <img src="general_framework.jpg" width="350" align='center'>
 </div>
 
-## Robust Linear Regression Imputer
+## RIFLE as an Imputation Tool
 To run the robust linear regression imputer on a given dataset containing missing values, execute the following command on a terminal (linux) or command line (windows):
 
 ```
 python run.py input_file.csv output_file.csv 
 ```
+
+
+## Performance of RIFLE
+In the following figure, we compare the performance of RIFLE with MissForest and MICE (two popular imputers) in terms of Normalized Root Mean-Squared Error (NMRSE). We count the number of features each one of these methods have a better performance for imputing them. RIFLE has a better performance compared to two other methods, especially when the proportion of missing values is higher.
+
+![Alt text](Counts.png?raw=true "Counts")
+  
