@@ -22,6 +22,27 @@ python run.py input_file.csv output_file.csv
 ```
 
 
+## ADMM Version:
+To accelerate the convergence and considering the PSD condition, we apply ADMM schema to the robust linear regression problem in the presence of missing values. Algorithm 6 in the paper is implemented and can be used via the following command:
+
+```
+python ADMM.py input_file.csv output_file.csv 
+```
+
+
+## Robust LDA and RIFLE for Classification Tasks
+Two algorithms are proposed for handling classification task via the framework described above: Thresholding RIFLE, Robust LDA. To run Robust LDA, use the following command:
+
+```
+python RobustLDA.py input_file.csv output_file.csv 
+```
+
+To use the thresholding algorithm, run the following command:
+
+```
+python Thresholding.py input_file.csv output_file.csv 
+```
+
 ## Performance of RIFLE
 In the following figure, we compare the performance of RIFLE with MissForest and MICE (two popular imputers) in terms of Normalized Root Mean-Squared Error (NMRSE). We count the number of features each one of these methods have a better performance for imputing them. RIFLE has a better performance compared to two other methods, especially when the proportion of missing values is higher.
 
