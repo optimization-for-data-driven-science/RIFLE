@@ -2,6 +2,7 @@
 RIFLE is a general framework for learning parameters of a statistical learning model on datasets containing a large amount of missing values. Supervised learning approaches, including linear regression, logistic regression, neural networks, and support vector machine (SVM) initially assume that the input data is complete, containing no missing values. However, availability of such clean datasets is scarce in many practical problems, especially in electronic medical records and clinical research. Integration of multiple datasets may also increase the size of data available to researchers as different organizations collect data from similar population in different areas. The obtained datasets can contain large blocks of missing values as they may not share exactly the same features (See below figure).
 
 ![Alt text](Merged_Datasets.png?raw=true "Title")
+*image_caption*
 
 In practice, a pre-processing step is performed on a given dataset to remove or impute missing values. Removing the rows containing missing values is not an option when the percentage of missingness in a dataset is high, or the distribution of missing values is MNAR (Missing Not At Random). On the other hand, the state-of-the-art approaches for data
 imputation are not robust to the large amount of missing values. Moreover, the error in the imputation phase can drastically affect the performance of the statistical model applied to the imputed dataset. 
