@@ -48,13 +48,13 @@ python Thresholding.py input_file.csv output_file.csv
 In the following figure, we compare the performance of RIFLE with MissForest and MICE (two popular imputers) in terms of Normalized Root Mean-Squared Error (NMRSE). We count the number of features each one of these methods have a better performance for imputing them. RIFLE has a better performance compared to two other methods, especially when the proportion of missing values is higher.
 
 ![Alt text](Counts.png?raw=true "Counts")
-*Figure2: Performance Comparison of RIFLE, MICE and MissForest on four UCI datasets: Parkinson, Spam, Wave Energy Converter, and Breast Cancer. For each dataset we count the number of features that each method has a better performance over other two methods.*
+*Figure 2: Performance Comparison of RIFLE, MICE and MissForest on four UCI datasets: Parkinson, Spam, Wave Energy Converter, and Breast Cancer. For each dataset we count the number of features that each method has a better performance over other two methods.*
 
 ## Sensitivity of RIFLE to Proportion of Missing Values and Number of Samples:
 In the next figure, we can observe that performance of RIFLE is less sensitive to the proportion of missing values compared to other state-of-the-art approaches including MIDA, KNN Imputer, Amelia, MICE, MissForest and Mean Imputer.
 
 ![Alt text](Sensitivity_Missing_Value_Proportion.png?raw=true "S_MP")
-
+*Figure 3: Sensitivity of RIFLE, MissForest, Mice, Amelia, KNN Imputer, MIDA and Mean Imputer to the percentage of missing values. Increasing the percentage of missing value entries degrades the performance of the benchmarks as compared to RIFLE. KNN-imputer implementation cannot be executed on datasets containing  80% (or more) missing entries. Moreover, Amelia and MIDA do not converge to a solution when the percentage of missing value entries is higher than 70%.*
 
 Moreover, we examine the sensitivity of RIFLE and other approaches to the number of samples. As it can be observed, when the number of samples is limited (relative to the number of features) RIFLE shows a better performance compared to other methods. When we increase the number of samples, still RIFLE has a good performance comparable to the non-linear imputer MissForest.
 
