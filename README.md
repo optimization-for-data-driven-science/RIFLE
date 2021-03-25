@@ -59,3 +59,4 @@ In the next figure, we can observe that performance of RIFLE is less sensitive t
 Moreover, we examine the sensitivity of RIFLE and other approaches to the number of samples. As it can be observed, when the number of samples is limited (relative to the number of features) RIFLE shows a better performance compared to other methods. When we increase the number of samples, still RIFLE has a good performance comparable to the non-linear imputer MissForest.
 
 ![Alt text](Sensitivity_Sample.png?raw=true "S_N")
+*Figure 4: Sensitivity of RIFLE, MissForest, Mice, Amelia, Mean Imputer, KNN Imputer, and MIDA to the number of samples for the imputations of Drive dataset containing 40% of MCAR missing values. When the number of samples is limited, RIFLE demonstrates better performance compared to other methods and its performance is very close to the non-linear imputer MissForest for larger samples.*
