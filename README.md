@@ -48,7 +48,7 @@ python Thresholding.py input_file.csv output_file.csv
 In the following figure, we compare the performance of RIFLE with MissForest and MICE (two popular imputers) in terms of Normalized Root Mean-Squared Error (NMRSE). We count the number of features each one of these methods have a better performance for imputing them. RIFLE has a better performance compared to two other methods, especially when the proportion of missing values is higher.
 
 ![Alt text](Counts.png?raw=true "Counts")
-*Figure 2: Performance Comparison of RIFLE, MICE and MissForest on four UCI datasets: Parkinson, Spam, Wave Energy Converter, and Breast Cancer. For each dataset we count the number of features that each method has a better performance over other two methods.*
+*Figure 2: Performance Comparison of RIFLE, MICE and MissForest on four UCI datasets: [Parkinson](https://archive.ics.uci.edu/ml/datasets/parkinsons), [Spam](https://archive.ics.uci.edu/ml/datasets/spambase), [Wave Energy Converter](https://archive.ics.uci.edu/ml/datasets/Wave+Energy+Converters), and [Breast Cancer](https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Prognostic)). For each dataset we count the number of features that each method has a better performance over other two methods.*
 
 ## Sensitivity of RIFLE to Proportion of Missing Values and Number of Samples:
 In the next figure, we can observe that performance of RIFLE is less sensitive to the proportion of missing values compared to other state-of-the-art approaches including MIDA, KNN Imputer, Amelia, MICE, MissForest and Mean Imputer.
