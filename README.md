@@ -15,6 +15,8 @@ Mathematically speaking, RIFLE solves the following min-max problem:
 <img src="general_framework.jpg" width="350" align='center'>
 </div>
 
+Overall, RIFLE solves a distributionally robust optimization problem over all distirbutions whose low-order marginals are within the range of estimated confidence intervals. Below figure, summarizes the methodology of RIFLE. 
+
 ## RIFLE as an Imputation Tool
 To run the robust linear regression imputer on a given dataset containing missing values, execute the following command on a terminal (linux) or command line (windows):
 
