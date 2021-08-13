@@ -25,7 +25,7 @@ Overall, RIFLE solves a distributionally robust optimization problem over all di
 To run the robust linear regression imputer on a given dataset containing missing values, execute the following command on a terminal (linux) or command line (windows):
 
 ```
-python run.py input_file.csv output_file.csv 
+python RIFLE/run.py input_file.csv output_file.csv 
 ```
 
 
@@ -33,7 +33,7 @@ python run.py input_file.csv output_file.csv
 To accelerate the convergence and considering the PSD condition, we apply ADMM schema to the robust linear regression problem in the presence of missing values. Algorithm 6 in the paper is implemented and can be used via the following command:
 
 ```
-python ADMM.py input_file.csv output_file.csv 
+python RIFLE_via_ADMM/ADMM.py input_file.csv output_file.csv 
 ```
 
 
@@ -41,13 +41,13 @@ python ADMM.py input_file.csv output_file.csv
 Two algorithms are proposed for handling classification task via the framework described above: Thresholding RIFLE, Robust LDA. To run Robust LDA, use the following command:
 
 ```
-python RobustLDA.py input_file.csv output_file.csv 
+python Classification/RobustLDA.py input_file.csv output_file.csv 
 ```
 
 To use the thresholding algorithm, run the following command:
 
 ```
-python Thresholding.py input_file.csv output_file.csv 
+python Classification/Thresholding.py input_file.csv output_file.csv 
 ```
 
 ## Performance of RIFLE
