@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from math import sqrt
 import multiprocessing
+import time
 
 
 class RobustImputer:
@@ -36,6 +37,10 @@ class RobustImputer:
         self.transformed_data = pd.DataFrame(transformed, columns=data.columns, index=data.index)
 
     def find_confidence_interval(self, feature_index1, feature_index2):
+
+        # print starting point and features for each process
+        print(f'starting find_confidence_interval with {feature_index1, feature_index2}')
+
         data = self.transformed_data
         cols = data.columns
         feature_i = cols[feature_index1]
@@ -66,17 +71,38 @@ class RobustImputer:
 
         self.confidence_matrix[feature_index1][feature_index2] = np.std(estimation_array)
 
+        # print ending point and features for each process
+        print(f'finishing find_confidence_interval with {feature_index1, feature_index2}')
+
     def estimate_confidence_intervals(self):
 
         data = self.transformed_data
         dimension = data.shape[1]
+        # initialized confidence matrix so that we are not subscripting a NoneType object
+        self.confidence_matrix = np.zeros(shape=(dimension, dimension))
 
+        # start timer
+        start = time.time()
+
+        # list to keep track of processes because all processes must be started before any can be joined
+        process_list = []
         for i in range(dimension):
             for j in range(i, dimension):
-                p = multiprocessing.Process(target=find_confidence_interval, args=(i, j,))
+                p = multiprocessing.Process(target=self.find_confidence_interval, args=(i, j,))
+                p.start()
+                process_list.append(p)
                 # 1) start and join the process
                 # 2) Check whether the code works properly
                 # 3) check whether the solution is acceptable (same as the previous case)
+
+        # join all processes and verify they have ended
+        for process in process_list:
+            process.join()
+            print(f'Process p is alive: {process.is_alive()}')
+
+        # end timer and output time taken
+        end = time.time()
+        print('Done in {:.4f} seconds'.format(end-start))
 
         #
         # for j in range(dimension):
