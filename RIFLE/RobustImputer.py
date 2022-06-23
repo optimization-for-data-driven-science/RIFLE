@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from math import sqrt
+import multiprocessing
 
 
 class RobustImputer:
@@ -34,47 +35,55 @@ class RobustImputer:
         transformed = sc.transform(self.data)
         self.transformed_data = pd.DataFrame(transformed, columns=data.columns, index=data.index)
 
+    def find_confidence_interval(self, feature_index1, feature_index2):
+        data = self.transformed_data
+        cols = data.columns
+        feature_i = cols[feature_index1]
+        feature_j = cols[feature_index2]
+        columns = data[[feature_i, feature_j]]
+        intersections = columns[columns[[feature_i, feature_j]].notnull().all(axis=1)]
+
+        intersection_num = len(intersections)
+
+        sample_size = int(intersection_num * self.bootstrap_proportion)
+
+        if sample_size < 2:
+            max_vals = columns.max()
+            max1 = max_vals[feature_i]
+            max2 = max_vals[feature_j]
+            self.confidence_matrix[feature_index1][feature_index2] = max1 * max2
+
+        estimation_array = []
+        for ind in range(self.number_of_bootstrap_estimations):
+            # current_sample = np.array(intersections.sample(n=sample_size, replace=self.with_replacement))
+            # For debugging
+            current_sample = np.array(
+                intersections.sample(n=sample_size, replace=self.with_replacement, random_state=1))
+            f1 = current_sample[:, 0]
+            f2 = current_sample[:, 1]
+            inner_prod = np.inner(f1, f2) / sample_size
+            estimation_array.append(inner_prod)
+
+        self.confidence_matrix[feature_index1][feature_index2] = np.std(estimation_array)
+
     def estimate_confidence_intervals(self):
 
         data = self.transformed_data
         dimension = data.shape[1]
-        confidence_matrix = np.zeros(shape=(dimension, dimension))
-
-        cols = data.columns
 
         for i in range(dimension):
             for j in range(i, dimension):
-                feature_i = cols[i]
-                feature_j = cols[j]
-                columns = data[[feature_i, feature_j]]
-                intersections = columns[columns[[feature_i, feature_j]].notnull().all(axis=1)]
+                p = multiprocessing.Process(target=find_confidence_interval, args=(i, j,))
+                # 1) start and join the process
+                # 2) Check whether the code works properly
+                # 3) check whether the solution is acceptable (same as the previous case)
 
-                intersection_num = len(intersections)
+        #
+        # for j in range(dimension):
+        #     for i in range(j + 1, dimension):
+        #         confidence_matrix[i][j] = confidence_matrix[j][i]
 
-                sample_size = int(intersection_num * self.bootstrap_proportion)
-
-                if sample_size < 2:
-                    max_vals = columns.max()
-                    max1 = max_vals[feature_i]
-                    max2 = max_vals[feature_j]
-                    confidence_matrix[i][j] = max1 * max2
-                    continue
-
-                estimation_array = []
-                for ind in range(self.number_of_bootstrap_estimations):
-                    current_sample = np.array(intersections.sample(n=sample_size, replace=self.with_replacement))
-                    f1 = current_sample[:, 0]
-                    f2 = current_sample[:, 1]
-                    inner_prod = np.inner(f1, f2) / sample_size
-                    estimation_array.append(inner_prod)
-
-                confidence_matrix[i][j] = np.std(estimation_array)
-
-        for j in range(dimension):
-            for i in range(j + 1, dimension):
-                confidence_matrix[i][j] = confidence_matrix[j][i]
-
-        self.confidence_matrix = confidence_matrix
+        # self.confidence_matrix = confidence_matrix
 
     def impute_data(self, column_index):
         data = self.transformed_data
