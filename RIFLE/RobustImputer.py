@@ -36,73 +36,64 @@ class RobustImputer:
         transformed = sc.transform(self.data)
         self.transformed_data = pd.DataFrame(transformed, columns=data.columns, index=data.index)
 
-    def find_confidence_interval(self, feature_index1, feature_index2):
+    def find_confidence_interval(self, feature_index1):
 
         # print starting point and features for each process
-        print(f'starting find_confidence_interval with {feature_index1, feature_index2}')
+        # print(f'starting find_confidence_interval with {feature_index1}')
 
         data = self.transformed_data
-        cols = data.columns
-        feature_i = cols[feature_index1]
-        feature_j = cols[feature_index2]
-        columns = data[[feature_i, feature_j]]
-        intersections = columns[columns[[feature_i, feature_j]].notnull().all(axis=1)]
+        dimension = data.shape[1]
+        for feature_index2 in range(feature_index1, dimension):
+            cols = data.columns
+            feature_i = cols[feature_index1]
+            feature_j = cols[feature_index2]
+            columns = data[[feature_i, feature_j]]
+            intersections = columns[columns[[feature_i, feature_j]].notnull().all(axis=1)]
 
-        intersection_num = len(intersections)
+            intersection_num = len(intersections)
 
-        sample_size = int(intersection_num * self.bootstrap_proportion)
+            sample_size = int(intersection_num * self.bootstrap_proportion)
 
-        if sample_size < 2:
-            max_vals = columns.max()
-            max1 = max_vals[feature_i]
-            max2 = max_vals[feature_j]
-            self.confidence_matrix[feature_index1][feature_index2] = max1 * max2
+            if sample_size < 2:
+                max_vals = columns.max()
+                max1 = max_vals[feature_i]
+                max2 = max_vals[feature_j]
+                self.confidence_matrix[feature_index1][feature_index2] = max1 * max2
 
-        estimation_array = []
-        for ind in range(self.number_of_bootstrap_estimations):
-            # current_sample = np.array(intersections.sample(n=sample_size, replace=self.with_replacement))
-            # For debugging
-            current_sample = np.array(
-                intersections.sample(n=sample_size, replace=self.with_replacement, random_state=1))
-            f1 = current_sample[:, 0]
-            f2 = current_sample[:, 1]
-            inner_prod = np.inner(f1, f2) / sample_size
-            estimation_array.append(inner_prod)
+            estimation_array = []
+            for ind in range(self.number_of_bootstrap_estimations):
+                # current_sample = np.array(intersections.sample(n=sample_size, replace=self.with_replacement))
+                # For debugging
+                current_sample = np.array(
+                    intersections.sample(n=sample_size, replace=self.with_replacement, random_state=1))
+                f1 = current_sample[:, 0]
+                f2 = current_sample[:, 1]
+                inner_prod = np.inner(f1, f2) / sample_size
+                estimation_array.append(inner_prod)
 
-        self.confidence_matrix[feature_index1][feature_index2] = np.std(estimation_array)
+            self.confidence_matrix[feature_index1][feature_index2] = np.std(estimation_array)
 
         # print ending point and features for each process
-        print(f'finishing find_confidence_interval with {feature_index1, feature_index2}')
+        # print(f'finishing find_confidence_interval with {feature_index1, feature_index2}')
 
     def estimate_confidence_intervals(self):
 
         data = self.transformed_data
         dimension = data.shape[1]
+
         # initialized confidence matrix so that we are not subscripting a NoneType object
         self.confidence_matrix = np.zeros(shape=(dimension, dimension))
 
         # start timer
         start = time.time()
 
-        # list to keep track of processes because all processes must be started before any can be joined
-        process_list = []
-        for i in range(dimension):
-            for j in range(i, dimension):
-                p = multiprocessing.Process(target=self.find_confidence_interval, args=(i, j,))
-                p.start()
-                process_list.append(p)
-                # 1) start and join the process
-                # 2) Check whether the code works properly
-                # 3) check whether the solution is acceptable (same as the previous case)
-
-        # join all processes and verify they have ended
-        for process in process_list:
-            process.join()
-            print(f'Process p is alive: {process.is_alive()}')
+        pool = multiprocessing.Pool()
+        pool.map(self.find_confidence_interval, range(dimension))
+        pool.close()
 
         # end timer and output time taken
         end = time.time()
-        print('Done in {:.4f} seconds'.format(end-start))
+        print('Confidence done in {:.4f} seconds'.format(end-start))
 
         #
         # for j in range(dimension):
@@ -112,6 +103,7 @@ class RobustImputer:
         # self.confidence_matrix = confidence_matrix
 
     def impute_data(self, column_index):
+        print(f'starting impute_data with {column_index}')
         data = self.transformed_data
         confidence_intervals = self.confidence_matrix
 
@@ -243,22 +235,41 @@ class RobustImputer:
             y_predict = np.dot(data_i.T, theta)
             predicts.append(y_predict[0][0])
 
-        return predicts
+        res = (column_index, predicts)
+        return res
 
     def impute(self):
+
+        start = time.time()
+
         original_data = self.data
         standard_deviations = original_data.std()
         means = original_data.mean()
         data_cols = original_data.columns
 
-        for column_ind in range(original_data.shape[1]):
-            print(data_cols[column_ind] + " is imputed.")
-            predictions = self.impute_data(column_ind)
-            predictions = [x * standard_deviations[column_ind] + means[column_ind] for x in predictions]
+        dimension = original_data.shape[1]
+        pool = multiprocessing.Pool()
+        predictions = pool.map(self.impute_data, range(dimension))
+        pool.close()
 
-            original_data[data_cols[column_ind]] = predictions
+        for pred_index in range(len(predictions)):
+            column_ind = predictions[pred_index][0]
+            print(data_cols[column_ind] + " is imputed.")
+            temp = [x * standard_deviations[column_ind] + means[column_ind] for x in predictions[pred_index][1]]
+
+            original_data[data_cols[column_ind]] = temp
+
+        # for column_ind in range(original_data.shape[1]):
+        #     print(data_cols[column_ind] + " is imputed.")
+        #     predictions = self.impute_data(column_ind)
+        #     predictions = [x * standard_deviations[column_ind] + means[column_ind] for x in predictions]
+        #
+        #     original_data[data_cols[column_ind]] = predictions
+        #
 
         self.imputed_data = original_data
+        end = time.time()
+        print('Impute done in {:.4f} seconds'.format(end - start))
 
     def write_to_csv(self, output_filename):
         self.imputed_data.to_csv(output_filename, index=False)

@@ -1,5 +1,6 @@
 from RobustImputer import RobustImputer
 import sys
+import time
 
 
 def run():
@@ -15,4 +16,7 @@ def run():
 # This guard is necessary to avoid creating subprocesses recursively.
 # Without it a runtime error is generated, but there is likely a more clever way to do this
 if __name__ == '__main__':
+    start = time.time()
     run()
+    end = time.time()
+    print('Done in {:.4f} seconds'.format(end - start))
