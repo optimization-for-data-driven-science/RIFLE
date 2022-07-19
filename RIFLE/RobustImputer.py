@@ -4,7 +4,7 @@ from sklearn.preprocessing import StandardScaler
 from math import sqrt
 import multiprocessing
 import time
-
+from preprocessing import PolyFeatures
 
 class RobustImputer:
 
@@ -16,17 +16,13 @@ class RobustImputer:
         self.validation_data_proportion = 0.1
         self.data = None
         self.transformed_data = None
+        self.poly_transformed_data = None
         self.confidence_matrix = None
         self.imputed_data = None
 
     def read_and_scale(self, filename):
-        self.data = pd.read_csv(filename)
-
-        sc = StandardScaler()
-        sc.fit(self.data)
-
-        transformed = sc.transform(self.data)
-        self.transformed_data = pd.DataFrame(transformed, columns=self.data.columns, index=self.data.index)
+        data = pd.read_csv(filename)
+        self.scale_data(data)
 
     def scale_data(self, data):
         self.data = data
@@ -34,6 +30,14 @@ class RobustImputer:
         sc.fit(self.data)
 
         transformed = sc.transform(self.data)
+
+        poly = PolyFeatures(3)
+        poly.fit(transformed)
+        poly_transformed = poly.transform(transformed)
+        self.poly_transformed_data = pd.DataFrame(data=poly_transformed,
+                                                  index=self.data.index,
+                                                  columns=poly.get_feature_names_out())
+
         self.transformed_data = pd.DataFrame(transformed, columns=data.columns, index=data.index)
 
     def find_confidence_interval(self, feature_index1):
