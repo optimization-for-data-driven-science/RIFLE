@@ -6,6 +6,7 @@ import multiprocessing
 import time
 from preprocessing import PolyFeatures
 
+
 class RobustImputer:
 
     def __init__(self):
@@ -19,9 +20,11 @@ class RobustImputer:
         self.poly_transformed_data = None
         self.confidence_matrix = None
         self.imputed_data = None
+        self.cols = None
 
     def read_and_scale(self, filename):
         self.data = pd.read_csv(filename)
+        self.cols = self.data.columns
 
         sc = StandardScaler()
         sc.fit(self.data)
@@ -58,7 +61,8 @@ class RobustImputer:
         # print starting point and features for each process
         # print(f'starting find_confidence_interval with {feature_index1}')
 
-        data = self.transformed_data
+        # data = self.transformed_data
+        data = self.poly_transformed_data
         dimension = data.shape[1]
         for feature_index2 in range(feature_index1, dimension):
             cols = data.columns
@@ -95,7 +99,8 @@ class RobustImputer:
 
     def estimate_confidence_intervals(self):
 
-        data = self.transformed_data
+        # data = self.transformed_data
+        data = self.poly_transformed_data
         dimension = data.shape[1]
 
         # initialized confidence matrix so that we are not subscripting a NoneType object
@@ -110,7 +115,7 @@ class RobustImputer:
 
         # end timer and output time taken
         end = time.time()
-        print('Confidence done in {:.4f} seconds'.format(end-start))
+        print('Confidence done in {:.4f} seconds'.format(end - start))
 
         #
         # for j in range(dimension):
@@ -121,10 +126,12 @@ class RobustImputer:
 
     def impute_data(self, column_index):
         print(f'starting impute_data with {column_index}')
-        data = self.transformed_data
+        # data = self.transformed_data
+        data = self.poly_transformed_data
         confidence_intervals = self.confidence_matrix
 
-        data_columns = data.columns
+        # data_columns = data.columns
+        data_columns = self.cols
 
         y_column = data_columns[column_index]
         X = data.drop([y_column], axis=1)
