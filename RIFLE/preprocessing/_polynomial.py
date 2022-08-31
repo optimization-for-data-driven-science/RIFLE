@@ -8,11 +8,20 @@ from scipy.special import comb
 from .validation import _check_feature_names_in
 
 
-# Simplified/altered version of PolynomialFeatures from sklearn.preprocessing
-# to preserve NaN values
-
-
 class PolyFeatures:
+    """ Generate interaction and polynomial features. Altered version of
+    sklearn.preprocessing.PolynomialFeatures to preserve NaN values.
+
+    Parameters
+    ----------
+    degree : int, default=2
+    Maximum degree of the polynomial features.
+
+    include_bias : bool, default=True
+    If 'True', then include the bias column, the feature in which all
+    polynomial powers are zero (acts as an intercept term in a linear
+    model.
+    """
 
     def __init__(self, degree=2, *, include_bias=True):
         self.degree = degree
@@ -65,6 +74,15 @@ class PolyFeatures:
         """
         Get output feature names for transformation.
 
+        Parameters
+        ----------
+        input_features : array of str objects or None, default=None
+        Input features.
+
+        Returns
+        -------
+        feature_names : ndarray of str objects
+        Transformed feature names.
         """
         powers = self.powers_
         input_features = _check_feature_names_in(self, input_features)
@@ -87,8 +105,16 @@ class PolyFeatures:
         """
         Compute number of output features.
 
-        """
+        Parameters
+        ----------
+        X : array-like matrix of shape (n_samples, n_features)
+        The data.
 
+        Returns
+        -------
+        self : object
+        Fitted transformer.
+        """
         _, n_features = X.shape
         self.n_features_in_ = n_features
         if isinstance(self.degree, numbers.Integral):
@@ -153,6 +179,16 @@ class PolyFeatures:
         """
         Transform data to polynomial features.
 
+        Parameters
+        ----------
+        X : array-like matrix of shape (n_samples, n_features)
+        The data to transform.
+
+        Returns
+        -------
+        XP : ndarray matrix of shape (n_samples, NP)
+        The matrix of features, where NP is the number of polynomial features
+        generated from the combination of inputs.
         """
         n_samples, n_features = X.shape
         # Do as if _min_degree = 0 and cut down array after the

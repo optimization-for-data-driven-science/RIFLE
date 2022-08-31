@@ -5,6 +5,19 @@ def _check_feature_names_in(estimator, input_features=None, *, generate_names=Tr
     """
     Check `input_features` and generate names if needed.
 
+    Parameters
+    ----------
+    input_features : array-like of type str or None, default=None
+    Input features.
+
+    generate_names : bool, default=None
+    Whether to generate names when 'input_features' is 'None'.
+
+    Return
+    ------
+    feature_names_in : ndarray of str or 'None'
+    Feature names in.
+
     """
 
     feature_names_in_ = getattr(estimator, "feature_names_in_", None)
