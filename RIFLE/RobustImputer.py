@@ -23,38 +23,39 @@ class RobustImputer:
         self.cols = None
 
     def read_and_scale(self, filename):
-        self.data = pd.read_csv(filename)
+        self.data = pd.read_csv(filename, na_values='?')
         self.cols = self.data.columns
 
         sc = StandardScaler()
         sc.fit(self.data)
-
         transformed = sc.transform(self.data)
+        self.transformed_data = pd.DataFrame(transformed, columns=self.data.columns, index=self.data.index)
 
-        poly = PolyFeatures(3)
-        poly.fit(transformed)
-        poly_transformed = poly.transform(transformed)
+        poly = PolyFeatures(2, include_bias=False)
+        poly.fit(self.data)
+        poly_data = poly.transform(self.data.to_numpy(dtype=float))
+        sc.fit(poly_data)
+        poly_transformed = sc.transform(poly_data)
         self.poly_transformed_data = pd.DataFrame(data=poly_transformed,
                                                   index=self.data.index,
                                                   columns=poly.get_feature_names_out(self.data.columns))
         print(self.poly_transformed_data)
-        self.transformed_data = pd.DataFrame(transformed, columns=self.data.columns, index=self.data.index)
 
     def scale_data(self, data):
         self.data = data
         sc = StandardScaler()
         sc.fit(self.data)
-
         transformed = sc.transform(self.data)
+        self.transformed_data = pd.DataFrame(transformed, columns=data.columns, index=data.index)
 
-        poly = PolyFeatures(3)
-        poly.fit(transformed)
-        poly_transformed = poly.transform(transformed)
+        poly = PolyFeatures(2, include_bias=False)
+        poly.fit(self.data)
+        poly_data = poly.transform(self.data.to_numpy(dtype=float))
+        sc.fit(poly_data)
+        poly_transformed = sc.transform(poly_data)
         self.poly_transformed_data = pd.DataFrame(data=poly_transformed,
                                                   index=self.data.index,
                                                   columns=poly.get_feature_names_out(data.columns))
-
-        self.transformed_data = pd.DataFrame(transformed, columns=data.columns, index=data.index)
 
     def find_confidence_interval(self, feature_index1):
 
@@ -104,7 +105,7 @@ class RobustImputer:
         dimension = data.shape[1]
 
         # initialized confidence matrix so that we are not subscripting a NoneType object
-        self.confidence_matrix = np.zeros(shape=(dimension, dimension))
+        self.confidence_matrix = np.zeros(shape=(dimension, dimension), dtype="float")
 
         # start timer
         start = time.time()
