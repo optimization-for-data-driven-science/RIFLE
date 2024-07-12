@@ -16,14 +16,49 @@ class RobustImputer:
         self.transformed_data = None
         self.confidence_matrix = None
         self.imputed_data = None
+        self.sc = None
+        self.untouched = None
+        self.mask1 = None
+        self.mask0 = None
+        self.remove_list = None
 
     def read_and_scale(self, filename):
         self.data = pd.read_csv(filename)
 
-        sc = StandardScaler()
-        sc.fit(self.data)
+        remove_list = []
+        columns = self.data.columns
+        nan_count = self.data.shape[0] - self.data.isna().sum()
+        # print(nan_count)
+        for i in range(len(nan_count)):
+            # print(columns[i], nan_count[i])
+            if nan_count[i] < 5:
+                remove_list.append(columns[i])
+        #print(1/0)
+        # for item in columns:
+        #     current_col = self.data[item]
+        #     if current_col.isnull().all():
+        #        remove_list.append(item)
 
-        transformed = sc.transform(self.data)
+        self.data.drop(remove_list, axis=1, inplace=True)
+        self.untouched = pd.read_csv(filename)
+
+        self.untouched.drop(remove_list, axis=1, inplace=True)
+        self.untouched = self.untouched.to_numpy()
+        self.untouched = np.nan_to_num(self.untouched)
+
+        if len(remove_list) > 0:
+            print("These features are removed since they have less than 5 elements: ", remove_list)
+
+        mask0 = self.data.isna()
+        mask0 = mask0.to_numpy()
+        mask1 = np.ones(shape=mask0.shape) - mask0  # 0 if Nan and 1 otherwise
+        self.mask0 = mask0
+        self.mask1 = mask1
+
+        self.sc = StandardScaler()
+        self.sc.fit(self.data)
+
+        transformed = self.sc.transform(self.data)
         self.transformed_data = pd.DataFrame(transformed, columns=self.data.columns, index=self.data.index)
 
     def scale_data(self, data):
@@ -42,6 +77,7 @@ class RobustImputer:
 
         cols = data.columns
 
+        # my_data = data['std_atomic_mass'].to_numpy()
         for i in range(dimension):
             for j in range(i, dimension):
                 feature_i = cols[i]
@@ -57,11 +93,19 @@ class RobustImputer:
                     max_vals = columns.max()
                     max1 = max_vals[feature_i]
                     max2 = max_vals[feature_j]
+                    # print("****")
+                    # print("Max1:", max1)
+                    # print("Max2:", max2)
+                    # print(feature_i)
+                    # print(feature_j)
+                    # # print(max_vals)
+                    # print(len(intersections))
+                    # print("****")
                     confidence_matrix[i][j] = max1 * max2
                     continue
 
                 estimation_array = []
-                for ind in range(self.number_of_bootstrap_estimations):
+                for _ in range(self.number_of_bootstrap_estimations):
                     current_sample = np.array(intersections.sample(n=sample_size, replace=self.with_replacement))
                     f1 = current_sample[:, 0]
                     f2 = current_sample[:, 1]
@@ -101,7 +145,7 @@ class RobustImputer:
 
         mask_X = X.isna()
         mask_X = mask_X.to_numpy()
-        mask_X = np.ones(shape=mask_X.shape) - mask_X
+        mask_X = np.ones(shape=mask_X.shape) - mask_X  # 0 if Nan and 1 otherwise
 
         mask_Y_test = Y.isna()
         mask_Y_test = mask_Y_test.to_numpy()
@@ -131,9 +175,12 @@ class RobustImputer:
         predicts = []
 
         for i in range(len(mask_X)):
-
-            if not np.isnan(data[[y_column]].loc[i][0]):
-                predicts.append(data[[y_column]].loc[i][0])
+            # print(data[y_column])
+            # print(data[y_column].iloc[i])
+            # print(data[y_column].index[i])
+            # print(1/0)
+            if not np.isnan(data[y_column].iloc[i]):
+                predicts.append(data[y_column].iloc[i])
                 continue
 
             row_i = mask_X[i]
@@ -212,6 +259,7 @@ class RobustImputer:
 
     def impute(self):
         original_data = self.data
+
         standard_deviations = original_data.std()
         means = original_data.mean()
         data_cols = original_data.columns
@@ -223,7 +271,8 @@ class RobustImputer:
 
             original_data[data_cols[column_ind]] = predictions
 
-        self.imputed_data = original_data
+        self.final_data = np.multiply(self.untouched, self.mask1) + np.multiply(original_data, self.mask0)
+        # print(self.final_data)
 
     def write_to_csv(self, output_filename):
-        self.imputed_data.to_csv(output_filename, index=False)
+        self.final_data.to_csv(output_filename, index=False)
